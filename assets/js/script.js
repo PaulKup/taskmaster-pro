@@ -153,6 +153,7 @@ $("#task-form-modal .btn-primary").click(function() {
 
     // save in tasks array
     tasks.toDo.push({
+      // creates new object properties and sets them
       text: taskText,
       date: taskDate
     });
@@ -163,6 +164,7 @@ $("#task-form-modal .btn-primary").click(function() {
 
 // remove all tasks
 $("#remove-tasks").on("click", function() {
+  // wtf is key if its initialized but not defined???
   for (var key in tasks) {
     tasks[key].length = 0;
     $("#list-" + key).empty();
@@ -172,5 +174,65 @@ $("#remove-tasks").on("click", function() {
 
 // load tasks for the first time
 loadTasks();
+
+// sets all ul's to sortable so drag and drop in enabled within and between the lists
+$(".card .list-group").sortable({
+  // connects the ul's to each other so drag drop can happen between lists
+  connectWith: $(".card .list-group"),
+  // disables scrolling when dragged element reaches window edge
+  scroll: false,
+  // default for dragged element to be considered 'over' another element is 50% of the element is intersecting but pointer changes it to when the cursor is over the element
+  tolerance: "pointer",
+  // ??? still unclear on this one
+  helper: "clone",
+  // same as dragstart and because lists are connected all of them activate and deactivate together
+  activate: function(event) {
+    //console.log("activate", this);
+  },
+  // dragstop
+  deactivate: function(event) {
+  //console.log("deactivate", this);
+  },
+  // detects the 'over' which is determined by tolerance: pointer
+  over: function(event) {
+    //console.log("over", event.target);
+  },
+  // when event is no longer 'over' a list either dragged out or dropped on
+  out: function(event) {
+    //console.log("out", event.target);
+  },
+  // when a list changes whether it be reordering or the removal or addition of a dragged element
+  update: function(event) {
+    // array to store task data
+    var tempArr = [];
+    // this refers to ul/ul's which was updated. each loops through all items in object/array and runs funtion on each item in this case the children of the ul the li
+    $(this).children().each(function() {
+      // this now refers to the object of the callback function which is now the li's (the children of the previous this)
+      var text = $(this)
+        // gets child DOM elements
+        .find("p")
+        // gets text contents of each element and their descendants (can also set the text contents of matched element)
+        .text()
+        // removes whitespace from beginning and end of string
+        .trim();
+      var date = $(this)
+        .find("span")
+        .text()
+        .trim();
+      // add task data to the temp array as an object
+      tempArr.push({
+        text: text,
+        date: date
+      });
+    });
+    // 'this' is ul which was updated.  strip first part of id from list so we are left with list name which matches what we called the list in the tasks object
+    var arrName = $(this)
+      .attr("id")
+      .replace("list-", "");
+    // update array on tasks object and save
+    tasks[arrName] = tempArr;
+    saveTasks();
+  }
+});
 
 
