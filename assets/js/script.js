@@ -235,4 +235,23 @@ $(".card .list-group").sortable({
   }
 });
 
+// makes the trash area droppable
+$("#trash").droppable({
+  // defines elements accepted to be dropped
+  accept: ".card .list-group-item",
+  // defines how the draggable element must overlap to be considered 'over' touch is any part of the elements touching
+  tolerance: "touch",
+  // event listener for when an element is dropped on trash. ui is an object with a property "draggable" which identifies the dropped element in the DOM.
+  // remove removes the dropped element and since an element was removed from its original list the sortable update() is triggered which calls saveTasks() to update localStorage
+  drop: function(event, ui) {
+    ui.draggable.remove();
+  },
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
+  }
+});
+
 
